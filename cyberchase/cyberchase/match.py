@@ -2,15 +2,18 @@ import time
 from .game import Game, SeekerException, HiderException
 from .hider import Hider
 from .seeker import Seeker
+import random
 
 class Match:
-    def __init__(self, SeekerClass, HiderClass):
+    def __init__(self, SeekerClass, HiderClass, games=25):
         self._count = 0
         self._valid_seeds = [1, 2, 5, 6, 7, 8, 11, 12, 14, 16, 19, 20, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 35, 38, 39, 41, 43, 45,
                     47, 48, 49, 51, 53, 55, 62, 63, 67, 69, 70, 71, 72, 75, 77, 79, 81, 82, 84, 86, 87, 90, 91, 92, 93, 95,
                     96, 97, 99, 101, 103, 107, 108, 112, 113, 114, 115, 117, 121, 122, 123, 128, 129, 131, 132, 134, 135,
                     138, 139, 146, 149, 153, 155, 157, 159, 161, 163, 166, 167, 168, 170, 171, 172, 175, 179, 181, 184, 190,
                     191, 192, 196, 198, 199]
+
+        self._valid_seeds = random.sample(self._valid_seeds, games)
 
         self._SeekerClass = SeekerClass
         self._seeker_points = 0
@@ -25,7 +28,7 @@ class Match:
 
     def run(self):
         for i, seed in enumerate(self._valid_seeds):
-            print(f"------------- Game {i} -------------")
+            print(f"------------- Game {i}/{len(self._valid_seeds)} -------------")
             try:
                 hider = self._HiderClass()
             except Exception as e:

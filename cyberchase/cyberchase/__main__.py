@@ -1,5 +1,6 @@
 from .match import Match
 import sys
+import json
 
 if len(sys.argv) != 4:
     print("Usage: \"python match.py seeker_file_name hider_file_name result_file_name\"")
