@@ -1,2 +1,2 @@
-# hide-n-seek-tg-22
+# cyberchase
 Game package for Turing Games (Spring 22)
