@@ -1,14 +1,14 @@
 from setuptools import setup
 
 setup(
-    name='cryptochase',
+    name='cyberchase',
     version='0.0.1',
     description='Game code for TAMU Spring 2022 Turing Games',
-    url='https://github.com/smh3005/cryptochase',
+    url='https://github.com/smh3005/cyberchase',
     author='Seth Hamilton and Trevor Bolton',
     author_email='logistics@theturinggames.com',
     license='BSD 2-clause',
-    packages=['cryptochase'],
+    packages=['cyberchase'],
     install_requires=['perlin-noise',
                       'numpy',
                       'perlin-noise',
