@@ -24,5 +24,8 @@ exec("\n".join(code))
 match.run()
 result_file_name = sys.argv[3]
 with open(f"{result_file_name}.json", "w") as f:
+    result = match.get_result()
+    result["seeker_name"] = sys.argv[1]
+    result["hider_name"] = sys.argv[2]
     json_str = json.dumps(match.get_result())
     f.write(json_str)
