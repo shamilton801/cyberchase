@@ -1,4 +1,6 @@
+from cyberchase.cyberchase.game import SeekerException, HiderException
 from .match import Match
+from .game import Game
 import sys
 import json
 
@@ -14,18 +16,42 @@ seeker_class_name = seeker_file_name.capitalize()
 hider_file_name = sys.argv[2]
 hider_class_name = hider_file_name.capitalize()
 
-code = [
-    f"from {seeker_file_name} import {seeker_class_name}",
-    f"from {hider_file_name} import {hider_class_name}",
-    f"match = Match({seeker_class_name}, {hider_class_name})",
-]
-exec("\n".join(code))
+debug_message = "Match run sucessfully"
+code_successful = True
+failed_type = -1
+try:
+    try:
+        exec(f"from {seeker_file_name} import {seeker_class_name}")
+    except Exception as e:
+        raise SeekerException(str(e))
 
-match.run()
+    try:
+        exec(f"from {hider_file_name} import {hider_class_name}")
+    except Exception as e:
+        raise HiderException(str(e))
+    
+    exec(f"match = Match({seeker_class_name}, {hider_class_name})")
+    match.run()
+except SeekerException as e:
+    debug_message = f"Could not import Seeker code: {str(e)}"
+    failed_type = Game.SEEKER
+    code_successful = False
+except HiderException as e:
+    debug_message = f"Could not import Hider code: {str(e)}"
+    failed_type = Game.HIDER
+    code_successful = False
+except Exception as e:
+    debug_message = str(e)
+    code_successful = False
+
 result_file_name = sys.argv[3]
 with open(f"{result_file_name}.json", "w") as f:
-    result = match.get_result()
-    result["seeker_name"] = sys.argv[1]
-    result["hider_name"] = sys.argv[2]
-    json_str = json.dumps(match.get_result())
+    result = {}
+    if code_successful:
+        result = match.get_result()
+    else:
+        result = Match.get_bad_launch(failed_type, debug_message)
+
+    result["debug"] = debug_message
+    json_str = json.dumps(result)
     f.write(json_str)

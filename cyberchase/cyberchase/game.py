@@ -14,6 +14,7 @@ class HiderException(Exception):
 class Game:
     SEEKER = 1
     HIDER = 2
+    MAX_TIME_DIF = 0.01
 
     def __init__(self, hider_bot: Hider, seeker_bot: Seeker, seed: int, render=True):
         self.hider_bot = hider_bot
@@ -22,7 +23,7 @@ class Game:
         self.board = Board(30, 30, seed, "perlin", render=render)
 
         self.turns_complete = 0
-        self.max_turns = 250
+        self.max_turns = 200
 
     def game_loop(self):
         turn_value = self.turn()
@@ -58,7 +59,11 @@ class Game:
         valid_moves_copy = list(valid_moves)
         
         try:
+            start = time.time()
             hider_action = self.hider_bot.get_action_from_state(board_states, visible_squares, valid_moves_copy)
+            end = time.time()
+            if end-start >= self.MAX_TIME_DIF:
+                raise Exception(f"Hider too slow. Turn took {end-start:.4f} seconds")
         except Exception as e:
             raise HiderException(e)
 
@@ -80,7 +85,11 @@ class Game:
         valid_moves_copy = list(valid_moves)
         
         try:
+            start = time.time()
             seeker_action = self.seeker_bot.get_action_from_state(board_states, visible_squares, valid_moves_copy)
+            end = time.time()
+            if end-start >= self.MAX_TIME_DIF:
+                raise Exception(f"Seeker too slow. Turn took {end-start:.4f} seconds")
         except Exception as e:
             raise SeekerException(e)
         

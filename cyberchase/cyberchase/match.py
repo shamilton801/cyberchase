@@ -4,8 +4,10 @@ from .hider import Hider
 from .seeker import Seeker
 import random
 
+DEFAULT_NUM_GAMES = 15
+
 class Match:
-    def __init__(self, SeekerClass, HiderClass, games=25):
+    def __init__(self, SeekerClass, HiderClass, games=DEFAULT_NUM_GAMES):
         self._count = 0
         self._valid_seeds = [1, 2, 5, 6, 7, 8, 11, 12, 14, 16, 19, 20, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 35, 38, 39, 41, 43, 45,
                     47, 48, 49, 51, 53, 55, 62, 63, 67, 69, 70, 71, 72, 75, 77, 79, 81, 82, 84, 86, 87, 90, 91, 92, 93, 95,
@@ -24,7 +26,6 @@ class Match:
         self._hider_points = 0
         self._hider_errors = 0
         self._hider_info = []
-
 
     def run(self):
         for i, seed in enumerate(self._valid_seeds):
@@ -47,15 +48,21 @@ class Match:
                 start = time.time()
                 game = Game(hider, seeker, seed, render=False)
                 winner, timesteps = game.game_loop()
-                self._seeker_points += game.max_turns - timesteps
-                self._hider_points += timesteps
+                seeker_score = game.max_turns - timesteps
+                hider_score = timesteps
+                self._seeker_points += seeker_score
+                self._hider_points += hider_score
+                self._seeker_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, Seeker Score {seeker_score}, Hider Score {hider_score}")
+                self._hider_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, Seeker Score {seeker_score}, Hider Score {hider_score}")
                 finish_time = time.time()
             except SeekerException as e:
                 self._seeker_errors += 1
                 self._seeker_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, {e}")
+                self._hider_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, Seeker got error. Hider not penalized")
             except HiderException as e:
                 self._hider_errors += 1
                 self._hider_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, {e}")
+                self._seeker_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, Hider got error. Seeker not penalized")
 
             print("Total time (sec):", finish_time - start)
             print(f"winner: {winner}")
@@ -70,5 +77,16 @@ class Match:
             "hider_errors": self._hider_errors,
             "seeker_info": '\n'.join(self._seeker_info),
             "hider_info": '\n'.join(self._hider_info),
+        }
+        return result
+
+    def get_bad_launch(self, type, msg):
+        result = {
+            "seeker_points": 0,
+            "hider_points": 0,
+            "seeker_errors": DEFAULT_NUM_GAMES if type == Game.SEEKER else 0,
+            "hider_errors": DEFAULT_NUM_GAMES if type == Game.Hider else 0,
+            "seeker_info": f"{msg}. {'Does not affect seeker\'s score' if type != Game.SEEKER else ''}",
+            "hider_info": f"{msg}. {'Does not affect hider\'s score' if type != Game.HIDER else ''}",
         }
         return result
