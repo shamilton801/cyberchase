@@ -1,4 +1,4 @@
-from cyberchase.cyberchase.game import SeekerException, HiderException
+from .game import SeekerException, HiderException
 from .match import Match
 from .game import Game
 import sys

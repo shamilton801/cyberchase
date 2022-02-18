@@ -80,13 +80,13 @@ class Match:
         }
         return result
 
-    def get_bad_launch(self, type, msg):
+    def get_bad_launch(type, msg):
         result = {
             "seeker_points": 0,
             "hider_points": 0,
             "seeker_errors": DEFAULT_NUM_GAMES if type == Game.SEEKER else 0,
-            "hider_errors": DEFAULT_NUM_GAMES if type == Game.Hider else 0,
-            "seeker_info": f"{msg}. {'Does not affect seeker\'s score' if type != Game.SEEKER else ''}",
-            "hider_info": f"{msg}. {'Does not affect hider\'s score' if type != Game.HIDER else ''}",
+            "hider_errors": DEFAULT_NUM_GAMES if type == Game.HIDER else 0,
+            "seeker_info": f"{msg}. {'Does not affect seeker score' if type != Game.SEEKER else ''}",
+            "hider_info": f"{msg}. {'Does not affect hider score' if type != Game.HIDER else ''}",
         }
         return result
