@@ -65,6 +65,10 @@ class Match:
                 self._seeker_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, Seeker Score {seeker_score}, Hider Score {hider_score}")
                 self._hider_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, Seeker Score {seeker_score}, Hider Score {hider_score}")
                 finish_time = time.time()
+                print("Total time (sec):", finish_time - start)
+                print(f"winner: {winner}")
+                print(f"turn count: {timesteps}")
+                print(f"seconds/turn: {(finish_time - start)/timesteps:.3f}")
             except SeekerException as e:
                 self._seeker_errors += 1
                 self._seeker_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, {e}")
@@ -74,10 +78,6 @@ class Match:
                 self._hider_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, {e}")
                 self._seeker_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, Hider got error. Seeker not penalized")
 
-            print("Total time (sec):", finish_time - start)
-            print(f"winner: {winner}")
-            print(f"turn count: {timesteps}")
-            print(f"seconds/turn: {(finish_time - start)/timesteps:.3f}")
 
     def get_result(self):
         result = {
