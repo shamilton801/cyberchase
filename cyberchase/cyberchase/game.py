@@ -48,7 +48,7 @@ class Game:
         if other_player_position not in visible_squares:
             curr_board_states[other_player_position[0], other_player_position[1]] = self.board.AVAILABLE
         # Probably also give possible moves for that player
-        valid_moves = self.board.walk_board(player_position, player_movement)
+        valid_moves = self.board.get_possible_moves(player_position, player_movement, player)
         return curr_board_states, visible_squares, valid_moves
 
     # Gives each player a turn, checks if board is in win state after each turn

@@ -1,3 +1,4 @@
+from pkgutil import walk_packages
 import numpy as np
 from perlin_noise.perlin_noise import PerlinNoise
 import pygame
@@ -12,6 +13,9 @@ class Board:
     WALL = 3
     PLAYER_1_VISION = 4
     PLAYER_2_VISION = 5
+    PLAYER_BOTH_VISION = 6
+    PLAYER_1_FOUND = 7
+    PLAYER_2_FOUND = 7
 
     PLAYER_1_START = (2, 2)
     PLAYER_2_START = (27, 27)
@@ -34,7 +38,8 @@ class Board:
             self.screen = pygame.display.set_mode([self.height * self.square_render_size, self.width * self.square_render_size])
             self.colors = {self.AVAILABLE: (255, 255, 255), self.PLAYER_1: (255, 0, 0), self.PLAYER_2: (0, 0, 255),
                            self.WALL: (0, 0, 0), self.PLAYER_1_VISION: (255, 105, 180),
-                           self.PLAYER_2_VISION: (0, 255, 255)}
+                           self.PLAYER_2_VISION: (0, 255, 255), self.PLAYER_1_FOUND: (127, 0, 0), 
+                           self.PLAYER_2_FOUND: (0, 0, 127), self.PLAYER_BOTH_VISION: (127, 0, 255)}
 
         self.board_states = np.zeros((self.width, self.height), dtype=np.int8)
 
@@ -74,24 +79,16 @@ class Board:
         self.player_1_pos = self.player_1_pos
         self.player_2_pos = self.player_2_pos
 
-        for square in self.get_visible_squares(self.player_1_pos):
-            i, j = square
-            self.board_states[i, j] = self.PLAYER_1_VISION
-
-        for square in self.get_visible_squares(self.player_2_pos):
-            i, j = square
-            self.board_states[i, j] = self.PLAYER_2_VISION
-
         # print(self.board_states)
-        if not self.valid:
-            print("Not ", end="")
-        print("Valid")
+        # if not self.valid:
+        #     print("Not ", end="")
+        # print("Valid")
 
     @classmethod
     def from_board_state(board_state: List[List[int]], seeker_loc: Tuple[int, int], hider_loc: Tuple[int, int]):
         return Board(len(board_state), len(board_state[0]), None, None, board_state, seeker_loc, hider_loc)
 
-    def walk_board(self, start_pos: Tuple[int, int], max_depth: int) -> List[Tuple[int, int]]:
+    def walk_board(self, start_pos: Tuple[int, int], max_depth: int, exclude=[WALL]) -> List[Tuple[int, int]]:
         # Perform BFS
         visited = np.zeros(self.board_states.shape)
         visited[start_pos] = 1
@@ -103,7 +100,7 @@ class Board:
                          (curr[0], curr[1] - 1),
                          (curr[0], curr[1] + 1)]
             for neighbor in neighbors:
-                if not visited[neighbor] and self.board_states[neighbor] != self.WALL and depth < max_depth:
+                if not visited[neighbor] and self.board_states[neighbor] not in exclude and depth < max_depth:
                     visited[neighbor] = 1
                     queue.append((neighbor, depth + 1))
         tuple_of_indices = np.where(visited == 1)
@@ -111,13 +108,37 @@ class Board:
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        for i in range(self.board_states.shape[0]):
-            for j in range(self.board_states.shape[1]):
-                color = self.colors[self.board_states[i, j]]
+        board_with_vision = self.board_states
+
+        for square in self.get_visible_squares(self.player_1_pos):
+            i, j = square
+
+            to_set = self.PLAYER_1_VISION
+            if board_with_vision[i, j] == self.PLAYER_2:
+                to_set = self.PLAYER_2_FOUND
+            board_with_vision[i, j] = to_set
+
+        for square in self.get_visible_squares(self.player_2_pos):
+            i, j = square
+
+            to_set = self.PLAYER_2_VISION
+            if board_with_vision[i,j] == self.PLAYER_1:
+                to_set = self.PLAYER_1_FOUND
+            if board_with_vision[i,j] == self.PLAYER_1_VISION:
+                to_set = self.PLAYER_BOTH_VISION
+            self.board_states[i, j] = self.PLAYER_2_VISION
+
+        for i in range(board_with_vision.shape[0]):
+            for j in range(board_with_vision.shape[1]):
+                color = self.colors[board_with_vision[i, j]]
                 pygame.draw.rect(self.screen, color,
                                  pygame.Rect(i * self.square_render_size, j * self.square_render_size,
                                              self.square_render_size, self.square_render_size))
         pygame.display.flip()
+
+    def get_possible_moves(self, curr_pos: Tuple[int, int], speed: int, self_type: int) -> List[Tuple[int, int]]:
+        opponent_type = self.PLAYER_1 if self_type == self.PLAYER_2 else self.PLAYER_2
+        return self.walk_board(curr_pos, speed, [self.WALL, opponent_type])
 
     # Resolution was determined experimentally on the first 101 seeds to find the minimum number to find all squares
     def get_visible_squares(self, eye: Tuple[int, int], resolution: int =1) -> List[Tuple[int, int]]:
