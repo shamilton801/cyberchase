@@ -9,8 +9,10 @@ class Match:
     DEFAULT_NUM_GAMES = 15
     MAX_INIT_TIME = 3
 
-    def __init__(self, SeekerClass, HiderClass, games=DEFAULT_NUM_GAMES):
+    def __init__(self, SeekerClass, HiderClass, games=DEFAULT_NUM_GAMES, render=False, frame_delay=0.2):
         self._count = 0
+        self._render = render
+        self._frame_delay = frame_delay
         self._valid_seeds = [1, 2, 5, 6, 7, 8, 11, 12, 14, 16, 19, 20, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 35, 38, 39, 41, 43, 45,
                     47, 48, 49, 51, 53, 55, 62, 63, 67, 69, 70, 71, 72, 75, 77, 79, 81, 82, 84, 86, 87, 90, 91, 92, 93, 95,
                     96, 97, 99, 101, 103, 107, 108, 112, 113, 114, 115, 117, 121, 122, 123, 128, 129, 131, 132, 134, 135,
@@ -56,7 +58,7 @@ class Match:
 
             try:            
                 start = time.time()
-                game = Game(hider, seeker, seed, render=False)
+                game = Game(hider, seeker, seed, render=self._render, frame_delay=self._frame_delay)
                 winner, timesteps = game.game_loop()
                 seeker_score = game.max_turns - timesteps
                 hider_score = timesteps
@@ -66,7 +68,10 @@ class Match:
                 self._hider_info.append(f"Game {i}, Seed {self._valid_seeds[i]}, Seeker Score {seeker_score}, Hider Score {hider_score}")
                 finish_time = time.time()
                 print("Total time (sec):", finish_time - start)
-                print(f"winner: {winner}")
+                print(f"seeker_game score: {seeker_score}")
+                print(f"seeker_total score: {self._seeker_points}")
+                print(f"hider_game score: {hider_score}")
+                print(f"hider_total score: {self._hider_points}")
                 print(f"turn count: {timesteps}")
                 print(f"seconds/turn: {(finish_time - start)/timesteps:.3f}")
             except SeekerException as e:
@@ -85,8 +90,8 @@ class Match:
             "hider_points": self._hider_points,
             "seeker_errors": self._seeker_errors,
             "hider_errors": self._hider_errors,
-            "seeker_info": '\n'.join(self._seeker_info),
-            "hider_info": '\n'.join(self._hider_info),
+            "seeker_info": self._seeker_info,
+            "hider_info": self._hider_info,
         }
         return result
 
@@ -94,8 +99,8 @@ class Match:
         result = {
             "seeker_points": 0,
             "hider_points": 0,
-            "seeker_errors": DEFAULT_NUM_GAMES if type == Game.SEEKER else 0,
-            "hider_errors": DEFAULT_NUM_GAMES if type == Game.HIDER else 0,
+            "seeker_errors": Match.DEFAULT_NUM_GAMES if type == Game.SEEKER else 0,
+            "hider_errors": Match.DEFAULT_NUM_GAMES if type == Game.HIDER else 0,
             "seeker_info": f"{msg}. {'Does not affect seeker score' if type != Game.SEEKER else ''}",
             "hider_info": f"{msg}. {'Does not affect hider score' if type != Game.HIDER else ''}",
         }

@@ -16,21 +16,20 @@ class Game:
     HIDER = 2
     MAX_TIME_DIF = 0.01
 
-    def __init__(self, hider_bot: Hider, seeker_bot: Seeker, seed: int, render=True):
+    def __init__(self, hider_bot: Hider, seeker_bot: Seeker, seed: int, render=True, frame_delay=0.2):
         self.hider_bot = hider_bot
         self.seeker_bot = seeker_bot
-
         self.board = Board(30, 30, seed, "perlin", render=render)
-
         self.turns_complete = 0
-        self.max_turns = 200
+        self.max_turns = 250
+        self.frame_delay=frame_delay
 
     def game_loop(self):
         turn_value = self.turn()
         while turn_value == 0:
             if self.board.render:
                 self.board.draw()
-                # time.sleep(0.2)
+                time.sleep(self.frame_delay)
             turn_value = self.turn()
         if turn_value == 1:
             print("Seeker wins!")
