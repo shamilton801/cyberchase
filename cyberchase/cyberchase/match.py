@@ -4,9 +4,11 @@ from .hider import Hider
 from .seeker import Seeker
 import random
 
-DEFAULT_NUM_GAMES = 15
 
 class Match:
+    DEFAULT_NUM_GAMES = 15
+    MAX_INIT_TIME = 3
+
     def __init__(self, SeekerClass, HiderClass, games=DEFAULT_NUM_GAMES):
         self._count = 0
         self._valid_seeds = [1, 2, 5, 6, 7, 8, 11, 12, 14, 16, 19, 20, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 35, 38, 39, 41, 43, 45,
@@ -31,14 +33,22 @@ class Match:
         for i, seed in enumerate(self._valid_seeds):
             print(f"------------- Game {i}/{len(self._valid_seeds)} -------------")
             try:
+                start = time.time()
                 hider = self._HiderClass()
+                end = time.time()
+                if (end-start) > self.MAX_INIT_TIME:
+                    raise Exception(f"Hider took too long to initialize: {(end-start):.4f} seconds")
             except Exception as e:
                 print(e)
                 self._hider_errors += 1
                 continue
         
             try: 
+                start = time.time()
                 seeker = self._SeekerClass()
+                end = time.time()
+                if (end-start) > self.MAX_INIT_TIME:
+                    raise Exception(f"Seeker took too long to initialize: {(end-start):.4f} seconds")
             except Exception as e:
                 print(e)
                 self._seeker_errors += 1
