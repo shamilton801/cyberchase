@@ -4,6 +4,7 @@ import time
 from .hider import Hider
 from .seeker import Seeker
 from typing import List, Tuple
+import copy
 
 class SeekerException(Exception):
     pass
@@ -55,7 +56,7 @@ class Game:
     def turn(self) -> int:
         board_states, visible_squares, valid_moves = self.get_player_states(self.HIDER)
         # Make a copy to pass to the player so they can't modify
-        valid_moves_copy = list(valid_moves)
+        valid_moves_copy = copy.copy(valid_moves)
         
         try:
             start = time.time()

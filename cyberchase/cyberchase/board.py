@@ -4,6 +4,7 @@ from perlin_noise.perlin_noise import PerlinNoise
 import pygame
 from typing import Tuple, List
 from fractions import Fraction
+import copy
 
 
 class Board:
@@ -15,7 +16,7 @@ class Board:
     PLAYER_2_VISION = 5
     PLAYER_BOTH_VISION = 6
     PLAYER_1_FOUND = 7
-    PLAYER_2_FOUND = 7
+    PLAYER_2_FOUND = 8
 
     PLAYER_1_START = (2, 2)
     PLAYER_2_START = (27, 27)
@@ -108,7 +109,7 @@ class Board:
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        board_with_vision = self.board_states
+        board_with_vision = copy.copy(self.board_states)
 
         for square in self.get_visible_squares(self.player_1_pos):
             i, j = square
@@ -126,7 +127,7 @@ class Board:
                 to_set = self.PLAYER_1_FOUND
             if board_with_vision[i,j] == self.PLAYER_1_VISION:
                 to_set = self.PLAYER_BOTH_VISION
-            self.board_states[i, j] = self.PLAYER_2_VISION
+            board_with_vision[i, j] = to_set
 
         for i in range(board_with_vision.shape[0]):
             for j in range(board_with_vision.shape[1]):
