@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='cyberchase',
-    version='1.0.0',
+    version='1.1.0',
     description='Game code for TAMU Spring 2022 Turing Games',
     url='https://github.com/smh3005/cyberchase',
     author='Seth Hamilton and Trevor Bolton',

@@ -15,7 +15,7 @@ class HiderException(Exception):
 class Game:
     SEEKER = 1
     HIDER = 2
-    MAX_TIME_DIF = 0.01
+    MAX_TIME_DIF = 0.05
 
     def __init__(self, hider_bot: Hider, seeker_bot: Seeker, seed: int, render=True, frame_delay=0.2):
         self.hider_bot = hider_bot

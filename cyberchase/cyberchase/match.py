@@ -6,7 +6,7 @@ import random
 
 
 class Match:
-    DEFAULT_NUM_GAMES = 15
+    DEFAULT_NUM_GAMES = 25
     MAX_INIT_TIME = 3
 
     def __init__(self, SeekerClass, HiderClass, games=DEFAULT_NUM_GAMES, render=False, frame_delay=0.2):
@@ -19,7 +19,7 @@ class Match:
                     138, 139, 146, 149, 153, 155, 157, 159, 161, 163, 166, 167, 168, 170, 171, 172, 175, 179, 181, 184, 190,
                     191, 192, 196, 198, 199]
 
-        self._valid_seeds = random.sample(self._valid_seeds, games)
+        self._valid_seeds = self._valid_seeds[:self.DEFAULT_NUM_GAMES]
 
         self._SeekerClass = SeekerClass
         self._seeker_points = 0
